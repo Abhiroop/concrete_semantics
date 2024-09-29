@@ -74,6 +74,16 @@ theorem add_assoc : "add c (add a b) = add a (add b c)"
    apply (auto)
   done
 
+fun double :: "nat \<Rightarrow> nat" where
+"double 0 = 0" |
+"double (Suc m) = (Suc (Suc (double m)))"
+
+value "double 2"
+
+theorem double_add [simp] : "double m = add m m"
+  apply (induction m)
+   apply(auto)
+  done
 
   
 
