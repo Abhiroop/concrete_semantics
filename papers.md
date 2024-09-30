@@ -1,2 +1,6 @@
 - [Types, Bytes, and Separation Logic](https://trustworthy.systems/publications/nicta_full_text/134.pdf)
 - [Physical Addressing on Real Hardware in Isabelle/HOL](https://people.inf.ethz.ch/troscoe/pubs/achermann_itp_2018.pdf)
+- [A Formal Foundation for Secure Remote Execution of Enclaves](https://eprint.iacr.org/2017/565.pdf)
+- [Formal Specification and Verification of Secure Information Flow for Hardware Platforms](https://www2.eecs.berkeley.edu/Pubs/TechRpts/2023/EECS-2023-224.pdf)
+- [A Design and Verification Methodology for Secure Isolated Regions](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/06/A-Design-and-Verification-Methology-for-Secure-Isolated-Regions.pdf)
+- [Better Trust Zone: Verifying Security of Enclave-Aware Calculi](https://read.seas.harvard.edu/~kohler/class/cs260r-17/projects/better-trust-zone.pdf)
