@@ -1,1 +1,1 @@
-Working through the book on Concrete Semantics.
+Working through the book - Concrete Semantics.
