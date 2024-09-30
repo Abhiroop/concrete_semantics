@@ -85,8 +85,58 @@ theorem double_add [simp] : "double m = add m m"
    apply(auto)
   done
 
-  
+(* Ex 2.3 *)
 
 
+fun count :: "'a \<Rightarrow> 'a list \<Rightarrow> nat" where
+  "count _ Nil = 0" |
+  "count x (Cons y ys) = (if x = y then 1 else 0) + count x ys"
+
+fun length :: "'a list \<Rightarrow> nat" where
+  "length Nil = 0" |
+  "length (Cons x xs) = 1 + length xs"
+
+lemma count_length : "count x xs \<le> length xs"
+  apply(induction xs)
+   apply(auto)
+  done
+
+(* Ex 2.4 *)
+
+fun snoc :: "'a list \<Rightarrow> 'a \<Rightarrow> 'a list" where
+  "snoc Nil x = Cons x Nil" |
+  "snoc (Cons a as) x = Cons a (snoc as x)"
+
+fun reverse :: "'a list \<Rightarrow> 'a list" where
+  "reverse Nil = Nil" |
+  "reverse (Cons x xs) = snoc (reverse xs) x"
+
+
+lemma rev_snoc [simp] : "reverse (snoc xs x) = Cons x (reverse xs)"
+  apply(induction xs)
+   apply(auto)
+  done
+
+theorem rev_rev_02 [simp]: "reverse (reverse xs) = xs"
+  apply(induction xs)
+   apply(auto)
+  done
+
+(* Ex 2.5 *)
+
+fun sum_upto :: "nat \<Rightarrow> nat" where
+  "sum_upto 0 = 0" |
+  "sum_upto (Suc n) = (Suc n) + (sum_upto n)"
+
+
+
+value "sum_upto 10"
+
+value "(10 :: nat) div 3"
+
+theorem sum_upto_lem : "sum_upto n = (n * (n + 1)) div 2"
+  apply(induction n)
+  apply(auto)
+  done
 
 end

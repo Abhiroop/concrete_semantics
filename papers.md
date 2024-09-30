@@ -1,0 +1,1 @@
+- [Types, Bytes, and Separation Logic](https://trustworthy.systems/publications/nicta_full_text/134.pdf)
