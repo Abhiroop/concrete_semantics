@@ -1,1 +1,2 @@
 - [Types, Bytes, and Separation Logic](https://trustworthy.systems/publications/nicta_full_text/134.pdf)
+- [Physical Addressing on Real Hardware in Isabelle/HOL](https://people.inf.ethz.ch/troscoe/pubs/achermann_itp_2018.pdf)
