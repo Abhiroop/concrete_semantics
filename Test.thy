@@ -129,7 +129,6 @@ fun sum_upto :: "nat \<Rightarrow> nat" where
   "sum_upto (Suc n) = (Suc n) + (sum_upto n)"
 
 
-
 value "sum_upto 10"
 
 value "(10 :: nat) div 3"
@@ -137,6 +136,88 @@ value "(10 :: nat) div 3"
 theorem sum_upto_lem : "sum_upto n = (n * (n + 1)) div 2"
   apply(induction n)
   apply(auto)
+  done
+
+datatype 'a tree = Tip | Node "'a tree" 'a "'a tree"
+
+fun mirror :: "'a tree \<Rightarrow> 'a tree" where
+"mirror Tip = Tip" |
+"mirror (Node l a r) = Node (mirror r) a (mirror l)"
+
+lemma "mirror (mirror t) = t"
+  apply (induction t)
+   apply(auto)
+  done
+
+
+fun div2 :: "nat \<Rightarrow> nat" where
+"div2 0 = 0" |
+"div2 (Suc 0) = 0" |
+"div2 (Suc(Suc n)) = Suc(div2 n)"
+
+lemma "div2 n = n div 2"
+  apply(induction n rule: div2.induct)
+    apply(auto)
+  done
+
+(* Ex 2.6 *)
+fun contents :: "'a tree \<Rightarrow> 'a list" where
+  "contents Tip = Nil" |
+  "contents (Node l x r) = Cons x (app (contents l) (contents r))"
+
+fun sum_tree :: "nat tree \<Rightarrow> nat" where
+  "sum_tree Tip = 0" |
+  "sum_tree (Node l x r) = x + sum_tree l + sum_tree r"
+
+
+
+fun sum_list :: "nat list \<Rightarrow> nat" where
+  "sum_list Nil = 0"|
+  "sum_list (Cons x xs) = x + sum_list xs"
+
+lemma sum_lemma_aux [simp] : "sum_list (app xs ys) = sum_list xs + sum_list ys"
+  apply(induction xs)
+   apply(auto)
+  done
+
+lemma "sum_tree t = sum_list (contents t)"
+  apply(induction t)
+   apply(auto)
+  done
+
+(* Ex 2.7 *)
+fun pre_order :: "'a tree \<Rightarrow> 'a list" where
+  "pre_order Tip = Nil" |
+  "pre_order (Node l x r) = app (Cons x (pre_order l)) (pre_order r)"
+
+fun post_order :: "'a tree \<Rightarrow> 'a list" where
+  "post_order Tip = Nil" |
+  "post_order (Node l x r) = snoc (app (post_order l) (post_order r)) x"
+
+lemma snoc_cons_aux [simp] : "snoc xs x = app xs (Cons x Nil)"
+  apply(induction xs)
+   apply(auto)
+  done
+
+lemma "pre_order (mirror t) = rev (post_order t)"
+  apply(induction t)
+   apply(auto)
+  done
+
+(* Ex 2.8 *)
+fun map_list :: "('a \<Rightarrow> 'b) \<Rightarrow> 'a list \<Rightarrow> 'b list" where
+  "map_list f Nil = Nil" |
+  "map_list f (Cons x xs) = Cons (f x) (map_list f xs)"
+
+
+fun intersperse :: "'a \<Rightarrow> 'a list \<Rightarrow> 'a list" where
+  "intersperse x Nil = Nil" |
+  "intersperse x (Cons a (Cons b xs)) = Cons a (Cons x (intersperse x (Cons b xs)))" |
+  "intersperse x xs = Nil"
+
+lemma "map_list f (intersperse a xs) = intersperse (f a) (map_list f xs)"
+  apply(induction xs rule: intersperse.induct)
+    apply(auto)
   done
 
 end
