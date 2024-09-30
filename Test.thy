@@ -220,4 +220,45 @@ lemma "map_list f (intersperse a xs) = intersperse (f a) (map_list f xs)"
     apply(auto)
   done
 
+fun itrev :: "'a list \<Rightarrow> 'a list \<Rightarrow> 'a list" where
+"itrev Nil ys = ys" |
+"itrev (Cons x xs) ys = itrev xs (Cons x ys)"
+
+lemma itrev_app [simp] : "itrev xs ys = app (rev xs) ys"
+  apply (induction xs arbitrary: ys)
+  apply (auto)
+  done
+
+lemma "itrev xs Nil = rev xs"
+  apply(induction xs)
+  apply(auto)
+  done
+
+(* Ex 2.9 *)
+fun itadd :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
+"itadd 0 n = n" |
+"itadd (Suc m) n = itadd m (Suc n)"
+
+value "itadd 3 4"
+
+lemma "itadd m n = add m n"
+  apply(induction m arbitrary: n)
+  apply(auto)
+  done
+
+(* Ex 2.10 *)
+datatype tree0 = Tip0 | Node0 tree0 tree0
+
+fun nodes :: "tree0 \<Rightarrow> nat" where
+  "nodes Tip0 = 0" |
+  "nodes (Node0 t1 t2) = 1 + (nodes t1) + (nodes t2)"
+
+fun explode :: "nat \<Rightarrow> tree0 \<Rightarrow> tree0" where
+  "explode 0 t = t" |
+  "explode (Suc n) t = explode n (Node0 t t )"
+
+value "explode 2 (Node0 Tip0 Tip0)"
+
+
+
 end
