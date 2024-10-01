@@ -307,5 +307,71 @@ theorem "nodes (explode n t) = 2^n * nodes t + 2^n - 1"
 
 (* Ex 2.11 *)
 
+datatype exp = Var | Const int | Add exp exp | Mult exp exp
+
+fun eval :: "exp \<Rightarrow> int \<Rightarrow> int" where
+  "eval Var n = n" |
+  "eval (Const i) _ = i" |
+  "eval (Add e1 e2) n = (eval e1 n) + (eval e2 n)" |
+  "eval (Mult e1 e2) n = (eval e1 n) * (eval e2 n)"
+
+fun evalp :: "int list \<Rightarrow> int \<Rightarrow> int" where
+  "evalp Nil a = 0" |
+  "evalp (Cons x xs) a = x + a * evalp xs a"
+
+value "evalp (Cons 4 (Cons (-1) (Cons 0 (Cons 3 Nil)))) 2"
+
+
+fun scalar_mult :: "int \<Rightarrow> int list \<Rightarrow> int list" where
+  "scalar_mult k Nil = Nil" |
+  "scalar_mult k (Cons x xs) = Cons (k * x) (scalar_mult k xs)"
+
+fun poly_sum :: "int list \<Rightarrow> int list \<Rightarrow> int list" where
+  "poly_sum Nil ys = ys" |
+  "poly_sum xs Nil = xs" |
+  "poly_sum (Cons x xs) (Cons y ys) = Cons (x + y) (poly_sum xs ys)"
+
+fun poly_mul :: "int list \<Rightarrow> int list \<Rightarrow> int list" where
+  "poly_mul Nil xs = Nil" |
+  "poly_mul (Cons x xs) ys =
+    poly_sum (scalar_mult x ys) (Cons 0 (poly_mul xs ys))"
+
+fun coeffs :: "exp \<Rightarrow> int list" where
+  "coeffs Var = Cons 0 (Cons 1 Nil)" |
+  "coeffs (Const i) = Cons i Nil"    |
+  "coeffs (Add e1 e2)  = poly_sum (coeffs e1) (coeffs e2)" |
+  "coeffs (Mult e1 e2) = poly_mul (coeffs e1) (coeffs e2)"
+
+value "coeffs (Add (Mult Var (Const 4)) (Const 1))"
+
+(* 4+2x−x^2 +3x^3 *)
+value "let e = Add (Const 4)
+                (Add (Mult (Const 2) Var)
+                  (Add (Mult (Const (-1)) (Mult Var Var))
+                        (Mult (Const 3) (Mult Var (Mult Var Var)))))
+        in evalp (coeffs e) 2 = eval e 2"
+
+
+
+
+lemma evalp_sum [simp] : "evalp (poly_sum xs ys) x = evalp xs x + evalp ys x"
+  apply (induction xs ys rule: poly_sum.induct)
+  apply (auto simp:algebra_simps)
+  done
+
+lemma evalp_mul_aux [simp]: "evalp (scalar_mult x1 ys) x = x1 * evalp ys x"
+  apply(induction ys arbitrary: x1)
+  apply(auto simp: algebra_simps)
+  done
+
+lemma evalp_mul [simp] : "evalp (poly_mul xs ys) x = evalp xs x * evalp ys x"
+  apply(induction xs)
+  apply(auto simp: algebra_simps)
+  done
+
+theorem "evalp (coeffs e) x = eval e x"
+  apply(induction e)
+  apply(auto)
+  done
 
 end
