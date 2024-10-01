@@ -7,3 +7,8 @@
 - [Verified Secure Compilation for Mixed-Sensitivity Concurrent Programs](http://www.arxiv.org/pdf/2010.14032) - [Isabelle/HOL Mechanization](https://covern.org/jfpsc.html)
 - [Verifying that a compiler preserves concurrent value-dependent information-flow security](https://arxiv.org/pdf/1907.00713) - [Isabelle/HOL Mechanization](https://covern.org/itp19.html)
 - [Flexible Dynamic Information Flow Control in the Presence of Exceptions](https://arxiv.org/pdf/1207.1457)- [Coq mechanization](https://github.com/deian/lio-semantics/blob/master/lio_proofs.v)
+
+
+-[Discretionary Information Flow Control for Interaction-Oriented Specifications](https://backend.orbit.dtu.dk/ws/portalfiles/portal/119987994/Discretionary_Information_Flow_Control_for_Interaction_Oriented_Specifications.pdf) - Enforcing discretionary access control on choreographies.
+- [Security Protocols as Choreographies](https://backend.orbit.dtu.dk/ws/portalfiles/portal/265046987/Bruni2021_Chapter_SecurityProtocolsAsChoreograph.pdf) - The protocol uses TPM.
+- [Certifying Choreography Compilation](https://arxiv.org/pdf/2102.10698) - Certifying that the EPP code respects the communication protocol described in the choreography (EPP Theorem)
