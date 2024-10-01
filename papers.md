@@ -7,6 +7,8 @@
 - [Verified Secure Compilation for Mixed-Sensitivity Concurrent Programs](http://www.arxiv.org/pdf/2010.14032) - [Isabelle/HOL Mechanization](https://covern.org/jfpsc.html)
 - [Verifying that a compiler preserves concurrent value-dependent information-flow security](https://arxiv.org/pdf/1907.00713) - [Isabelle/HOL Mechanization](https://covern.org/itp19.html)
 - [Flexible Dynamic Information Flow Control in the Presence of Exceptions](https://arxiv.org/pdf/1207.1457)- [Coq mechanization](https://github.com/deian/lio-semantics/blob/master/lio_proofs.v)
+- [Information Flow Control for Distributed Trusted Execution Environments](https://dash.harvard.edu/bitstream/handle/1/40614411/tr-01-19%20revised.pdf?sequence=4&isAllowed=y)
+- [Language Support for Secure Software Development with Enclaves](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9505228)
 
 
 #### Choreographies
