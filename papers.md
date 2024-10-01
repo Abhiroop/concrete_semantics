@@ -5,4 +5,5 @@
 - [A Design and Verification Methodology for Secure Isolated Regions](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/06/A-Design-and-Verification-Methology-for-Secure-Isolated-Regions.pdf) - [Boogie mechnaization](https://slashconfidential.github.io/)
 - [Better Trust Zone: Verifying Security of Enclave-Aware Calculi](https://read.seas.harvard.edu/~kohler/class/cs260r-17/projects/better-trust-zone.pdf) - [Coq mechanization](https://github.com/aaronbembenek/verified-auto-enclave)
 - [Verified Secure Compilation for Mixed-Sensitivity Concurrent Programs](http://www.arxiv.org/pdf/2010.14032) - [Isabelle/HOL Mechanization](https://covern.org/jfpsc.html)
+- [Verifying that a compiler preserves concurrent value-dependent information-flow security](https://arxiv.org/pdf/1907.00713) - [Isabelle/HOL Mechanization](https://covern.org/itp19.html)
 - [Flexible Dynamic Information Flow Control in the Presence of Exceptions](https://arxiv.org/pdf/1207.1457)- [Coq mechanization](https://github.com/deian/lio-semantics/blob/master/lio_proofs.v)
