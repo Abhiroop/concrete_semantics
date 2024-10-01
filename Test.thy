@@ -250,15 +250,62 @@ lemma "itadd m n = add m n"
 datatype tree0 = Tip0 | Node0 tree0 tree0
 
 fun nodes :: "tree0 \<Rightarrow> nat" where
-  "nodes Tip0 = 0" |
+  "nodes Tip0 = 1" |
   "nodes (Node0 t1 t2) = 1 + (nodes t1) + (nodes t2)"
 
 fun explode :: "nat \<Rightarrow> tree0 \<Rightarrow> tree0" where
   "explode 0 t = t" |
   "explode (Suc n) t = explode n (Node0 t t )"
 
-value "explode 2 (Node0 Tip0 Tip0)"
+(*
+nodes (explode 3 t3)
+= nodes (explode 2 t3+t3+1)
+= nodes (explode 2 t7)
+= nodes (explode 1 t7+t7+1)
+= nodes (explode 1 t15)
+= nodes (explode 0 t15+t15+1)
+= nodes (explode 0 t31)
+= nodes t31
+= 31
+ *)
 
+value "nodes (Node0 Tip0 Tip0)"
+value "nodes (explode 2 (Node0 Tip0 Tip0))"
+
+value "nodes Tip0"
+value "nodes (explode 3 Tip0)"
+
+(* nodes t = 3
+   n = 0  nodes (explode n t) = 3
+   n = 1  nodes (explode n t) = 7
+   n = 2  nodes (explode n t) = 15
+   n = 3  nodes (explode n t) = 31
+
+  nodes t = 1
+  n = 0  nodes (explode n t) = 1
+  n = 1  nodes (explode n t) = 3
+  n = 2  nodes (explode n t) = 7
+  n = 3  nodes (explode n t) = 15
+
+
+f(0) = (nodes t)
+f(j) = 2 * f(j - 1) + 1
+
+
+(2 * nodes t) + 1
+ *)
+
+theorem "nodes (explode (Suc n) t) = (2 * (nodes (explode n t))) + 1"
+  apply(induction n arbitrary: t)
+  apply(auto)
+  done
+
+theorem "nodes (explode n t) = 2^n * nodes t + 2^n - 1"
+  apply (induction n arbitrary: t)
+  apply (auto simp add: algebra_simps)
+  done
+
+(* Ex 2.11 *)
 
 
 end
