@@ -87,6 +87,46 @@ lemma "aval (asimp a) s = aval a s"
   apply (auto)
   done
 
+(* Ex 3.1 *)
+
+fun optimal :: "aexp \<Rightarrow> bool" where
+  "optimal (N i) = True" |
+  "optimal (V x) = True" |
+  "optimal (Plus (N _) (N _)) = False" |
+  "optimal (Plus a b) = ((optimal a) \<and> (optimal b))"
+
+lemma "optimal (asimp_const a)"
+  apply(induction a)
+  apply(auto split: aexp.split)
+  done
+
+(* Ex 3.2 *)
+fun plus_ex :: "aexp \<Rightarrow> aexp \<Rightarrow> aexp" where
+  "plus_ex (N a) (N b) = N (a+b)" |
+  "plus_ex (Plus p (N a)) (N b) = Plus p (N (a+b))" |
+  "plus_ex (N b) (Plus p (N a)) = Plus p (N (a+b))" |
+  "plus_ex (Plus p (N a)) q = Plus (Plus p q) (N a)" |
+  "plus_ex q (Plus p (N a)) = Plus (Plus p q) (N a)" |
+  "plus_ex p (N i) = (if i = 0 then p else Plus p (N i))" |
+  "plus_ex (N i) p = (if i = 0 then p else Plus p (N i))" |
+  "plus_ex p q = (Plus p q)"
+
+fun full_asimp :: "aexp \<Rightarrow> aexp" where
+  "full_asimp (N a) = N a" |
+  "full_asimp (V x) = V x" |
+  "full_asimp (Plus p q) = plus_ex (full_asimp p) (full_asimp q)"
+
+lemma plus_ex_lemma [simp] :
+  "aval (plus_ex a1 a2) s = aval a1 s + aval a2 s"
+  apply(induction rule: plus_ex.induct)
+  apply(auto)
+  done
+
+theorem "aval (full_asimp a) s = aval a s"
+  apply(induction a)
+  apply (auto split: aexp.split)
+  done
+
 
 
 end
