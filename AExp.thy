@@ -240,4 +240,127 @@ lemma "lval e s = aval (inline e) s"
   apply(auto)
   done
 
+datatype bexp = Bc bool | Not bexp | And bexp bexp | Less aexp aexp
+
+fun bval :: "bexp \<Rightarrow> state \<Rightarrow> bool" where
+  "bval (Bc v ) s = v" |
+  "bval (Not b) s = (\<not> bval b s)" |
+  "bval (And b1 b2) s  = (bval b1 s \<and> bval b2 s)" |
+  "bval (Less a1 a2) s = (aval a1 s < aval a2 s)"
+
+fun not :: "bexp \<Rightarrow> bexp" where
+  "not (Bc True)  = Bc False" |
+  "not (Bc False) = Bc True" |
+  "not b = Not b"
+
+fun "and" :: "bexp \<Rightarrow> bexp \<Rightarrow> bexp" where
+  "and (Bc True) b = b" |
+  "and b (Bc True) = b" |
+  "and (Bc False) b = Bc False" |
+  "and b (Bc False) = Bc False" |
+  "and b1 b2 = And b1 b2 "
+
+fun less :: "aexp \<Rightarrow> aexp \<Rightarrow> bexp" where
+  "less (N n1) (N n2) = Bc(n1 < n2 )" |
+  "less a1 a2 = Less a1 a2"
+
+fun bsimp :: "bexp \<Rightarrow> bexp" where
+  "bsimp (Bc v)  = Bc v" |
+  "bsimp (Not b) = not (bsimp b)" |
+  "bsimp (And b1 b2)  = and (bsimp b1) (bsimp b2)" |
+  "bsimp (Less a1 a2) = less (asimp a1) (asimp a2)"
+
+(* Ex 3.7 *)
+definition Eq :: "aexp \<Rightarrow> aexp \<Rightarrow> bexp" where
+  "Eq p q = And (Not (Less p q)) (Not (Less q p))"
+
+definition Le :: "aexp \<Rightarrow> aexp \<Rightarrow> bexp" where
+  "Le p q = Not (Less q p)"
+
+theorem "bval (Eq a1 a2) s = (aval a1 s = aval a2 s)"
+  apply(simp add:Eq_def)
+  apply(auto)
+  done
+
+theorem "bval (Le a1 a2) s = (aval a1 s <= aval a2 s)"
+  apply(simp add:Le_def)
+  apply(auto)
+  done
+
+(* Ex 3.8 *)
+
+datatype ifexp = Bc2 bool | If ifexp ifexp ifexp | Less2 aexp aexp
+
+definition or :: "bexp \<Rightarrow> bexp \<Rightarrow> bexp" where
+  "or p q = Not (And (Not p) (Not q))"
+
+definition implies :: "bexp \<Rightarrow> bexp \<Rightarrow> bexp" where
+  "implies p q = or (Not p) q"
+
+definition bIf :: "bexp \<Rightarrow> bexp \<Rightarrow> bexp \<Rightarrow> bexp" where
+  "bIf a b c = And (implies a b) (implies (Not a) c)"
+
+fun ifval :: "ifexp \<Rightarrow> state \<Rightarrow> bool" where
+  "ifval (Bc2 b) s     = b" |
+  "ifval (If a b c) s  = (if (ifval a s) then (ifval b s) else (ifval c s))" |
+  "ifval (Less2 x y) s = (aval x s < aval y s)"
+
+
+fun b2ifexp :: "bexp \<Rightarrow> ifexp" where
+  "b2ifexp (Bc b)     = Bc2 b" |
+  "b2ifexp (Not b)    = (If (b2ifexp b) (Bc2 False) (Bc2 True))" |
+  "b2ifexp (And a b)  = (If (b2ifexp a) (b2ifexp b) (Bc2 False))" |
+  "b2ifexp (Less x y) = (Less2 x y)"
+
+fun if2bexp :: "ifexp \<Rightarrow> bexp" where
+  "if2bexp (Bc2 b) = Bc b" |
+  "if2bexp (If a b c) = bIf (if2bexp a) (if2bexp b) (if2bexp c)" |
+  "if2bexp (Less2 x y) = (Less x y)"
+
+theorem "bval (if2bexp p) s = ifval p s"
+  apply(induction p)
+  apply(simp_all add: bIf_def implies_def or_def)
+  done
+
+theorem "ifval (b2ifexp p) s = bval p s"
+  apply(induction p)
+  apply(auto)
+  done
+
+(* Ex 3.9 *)
+datatype pbexp = VAR vname | NEG pbexp | AND pbexp pbexp | OR pbexp pbexp
+
+fun pbval :: "pbexp \<Rightarrow> (vname \<Rightarrow> bool) \<Rightarrow> bool" where
+  "pbval (VAR x) s = s x" |
+  "pbval (NEG b) s = (\<not> pbval b s)" |
+  "pbval (AND b1 b2) s = (pbval b1 s \<and> pbval b2 s)" |
+  "pbval (OR b1 b2 ) s = (pbval b1 s \<or> pbval b2 s)"
+
+fun is_nnf :: "pbexp \<Rightarrow> bool" where
+  "is_nnf (VAR _)       = True" |
+  "is_nnf (NEG (VAR _)) = True" |
+  "is_nnf (NEG _)       = False" |
+  "is_nnf (AND b1 b2) = (is_nnf b1 \<and> is_nnf b2)" |
+  "is_nnf (OR  b1 b2) = (is_nnf b1 \<and> is_nnf b2)"
+
+
+fun nnf :: "pbexp \<Rightarrow> pbexp" where
+  "nnf (VAR x) = (VAR x)" |
+  "nnf (NEG (VAR p)) = (NEG (VAR p))" |
+  "nnf (NEG (NEG p)) = nnf p" |
+  "nnf (NEG (AND p q)) = OR (nnf (NEG p)) (nnf (NEG q))" |
+  "nnf (NEG (OR p q)) = AND (nnf (NEG p)) (nnf (NEG q))" |
+  "nnf (AND p q) = AND (nnf p) (nnf q)" |
+  "nnf (OR p q) = OR (nnf p) (nnf q)"
+
+lemma "(pbval (nnf b) s = pbval b s)"
+  apply(induction rule: nnf.induct)
+  apply(auto)
+  done
+
+lemma "is_nnf (nnf b)"
+  apply(induction b rule: nnf.induct)
+  apply(auto)
+  done
+
 end
