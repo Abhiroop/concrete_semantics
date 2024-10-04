@@ -363,4 +363,50 @@ lemma "is_nnf (nnf b)"
   apply(auto)
   done
 
+fun andb :: "pbexp \<Rightarrow> pbexp \<Rightarrow> pbexp" where
+  "andb p (OR h t) = OR (andb p h) (andb p t)" |
+  "andb (OR h t) p = OR (andb h p) (andb t p)" |
+  "andb p q = AND p q"
+
+lemma pbval_andb: "pbval (andb a b) s = pbval (AND a b) s"
+  apply (induction a b rule:andb.induct)
+  apply (auto)
+  done
+
+fun dnf_of_nnf :: "pbexp \<Rightarrow> pbexp" where
+  "dnf_of_nnf (VAR x) = VAR x" |
+  "dnf_of_nnf (NEG p) = NEG p" |
+  "dnf_of_nnf (OR p q) = OR (dnf_of_nnf p) (dnf_of_nnf q)" |
+  "dnf_of_nnf (AND p q) = andb (dnf_of_nnf p) (dnf_of_nnf q)"
+
+theorem "pbval (dnf_of_nnf p) s = pbval p s"
+  apply (induction p)
+  apply (auto simp add: pbval_andb)
+  done
+
+fun is_no_or :: "pbexp \<Rightarrow> bool" where
+  "is_no_or (VAR x) = True" |
+  "is_no_or (NEG p) = True" |
+  "is_no_or (AND p q) = ((is_no_or p) \<and> (is_no_or q))" |
+  "is_no_or (OR p q) = False"
+
+fun is_dnf :: "pbexp \<Rightarrow> bool" where
+  "is_dnf (VAR x) = True" |
+  "is_dnf (NEG p) = True" |
+  "is_dnf (AND p q) = ((is_no_or p) \<and> (is_no_or q))" |
+  "is_dnf (OR p q) = ((is_dnf p) \<and> (is_dnf q))"
+
+lemma isdnf_andb: "is_dnf p \<Longrightarrow> is_dnf q \<Longrightarrow> is_dnf (andb p q)"
+  apply (induction p q rule:andb.induct)
+  apply (auto)
+  done
+
+
+theorem "is_nnf b \<Longrightarrow> is_dnf (dnf_of_nnf b)"
+  apply (induction b)
+  apply (auto simp add: isdnf_andb)
+  done
+
+
+
 end
