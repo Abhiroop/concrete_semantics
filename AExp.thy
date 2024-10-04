@@ -170,7 +170,7 @@ fun timesm :: "aexpm \<Rightarrow> aexpm \<Rightarrow> aexpm" where
 fun asimpm :: "aexpm \<Rightarrow> aexpm" where
   "asimpm (Nm a) = Nm a" |
   "asimpm (Vm x) = Vm x" |
-  "asimpm (Plusm p q) = plusm (asimpm p) (asimpm q)" |
+  "asimpm (Plusm p q)  = plusm (asimpm p) (asimpm q)" |
   "asimpm (Timesm p q) = timesm (asimpm p) (asimpm q)"
 
 lemma avalm_plus[simp]: "avalm (plusm p q) s = avalm p s + avalm q s"
@@ -186,6 +186,58 @@ lemma avalm_times[simp]: "avalm (timesm p q) s = avalm p s * avalm q s"
 theorem "avalm (asimpm p) s = avalm p s"
   apply (induction p)
   apply (auto)
+  done
+
+(* Ex 3.5 *)
+datatype aexp2 = N2 int | V2 vname | Plus2  aexp2 aexp2
+               | PlusPlus2 vname   | Times2 aexp2 aexp2 | Div2 aexp2 aexp2
+
+fun aval2 :: "aexp2 \<Rightarrow> state \<Rightarrow> (val \<times> state) option" where
+  "aval2 (N2 a) s = Some (a, s)" |
+  "aval2 (V2 x) s = Some (s x, s)" |
+  "aval2 (PlusPlus2 x) s = Some (s x, s(x:= 1 + (s x)))" |
+  "aval2 (Plus2 a b) s =
+    (case (aval2 a s, aval2 b s) of
+      (None, Some q)   \<Rightarrow> None |
+      (Some p, None)   \<Rightarrow> None |
+      (Some p, Some q) \<Rightarrow>
+        Some ((fst p + fst q), (\<lambda>x.((snd p) x) + ((snd q) x) - (s x))))" |
+  "aval2 (Times2 a b) s =
+    (case (aval2 a s, aval2 b s) of
+      (None, Some q)   \<Rightarrow> None |
+      (Some p, None)   \<Rightarrow> None |
+      (Some p, Some q) \<Rightarrow>
+        Some ((fst p * fst q), (\<lambda>x.((snd p) x) + ((snd q) x) - (s x))))" |
+  "aval2 (Div2 a b) s =
+    (case (aval2 a s, aval2 b s) of
+      (None, Some q)   \<Rightarrow> None |
+      (Some p, None)   \<Rightarrow> None |
+      (Some p, Some q) \<Rightarrow>
+        (if fst q = 0 then None
+        else Some ((fst p div fst q),
+            (\<lambda>x.((snd p) x) + ((snd q) x) - (s x)))))"
+
+(* Ex 3.6 *)
+
+datatype lexp = Nl int | Vl vname | Plusl lexp lexp | LET vname lexp lexp
+
+
+fun lval :: "lexp \<Rightarrow> state \<Rightarrow> int" where
+  "lval (Nl a) s = a" |
+  "lval (Vl x) s = s x" |
+  "lval (Plusl p q) s = lval p s + lval q s" |
+  "lval (LET x a e) s = lval e (s(x:=lval a s))"
+
+
+fun inline :: "lexp \<Rightarrow> aexp" where
+  "inline (Nl i)     = N i" |
+  "inline (Vl vname) = V vname" |
+  "inline (Plusl p q) = Plus (inline p) (inline q)" |
+  "inline (LET x a e) = subst x (inline a) (inline e)"
+
+lemma "lval e s = aval (inline e) s"
+  apply(induction e arbitrary: s)
+  apply(auto)
   done
 
 end
