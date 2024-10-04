@@ -11,9 +11,9 @@ type_synonym state = "vname \<Rightarrow> val"
 datatype aexp = N int | V vname | Plus aexp aexp
 
 fun aval :: "aexp \<Rightarrow> state \<Rightarrow> val" where
-"aval (N n) s = n" |
-"aval (V x) s = s x" |
-"aval (Plus a\<^sub>1 a\<^sub>2) s = aval a\<^sub>1 s + aval a\<^sub>2 s"
+  "aval (N n) s = n" |
+  "aval (V x) s = s x" |
+  "aval (Plus a\<^sub>1 a\<^sub>2) s = aval a\<^sub>1 s + aval a\<^sub>2 s"
 
 
 value "aval (Plus (V ''y'') (N 5)) (\<lambda>x. if x = ''x'' then 7 else 0)"
@@ -127,6 +127,65 @@ theorem "aval (full_asimp a) s = aval a s"
   apply (auto split: aexp.split)
   done
 
+(* Ex 3.3 *)
+fun subst :: "vname \<Rightarrow> aexp \<Rightarrow> aexp \<Rightarrow> aexp" where
+  "subst var a (N n) = N n" |
+  "subst var a (V x) = (if x = var then a else (V x))" |
+  "subst var a (Plus a1 a2) = Plus (subst var a a1) (subst var a a2)"
 
+lemma subst_lemma [simp]: "aval (subst x a e) s = aval e (s(x := aval a s))"
+  apply (induction e)
+  apply (auto)
+  done
+
+lemma "aval a1 s = aval a2 s \<Longrightarrow> aval (subst x a1 e) s = aval (subst x a2 e) s"
+  apply (induction e)
+  apply (auto)
+  done
+
+(* Ex 3.4 *)
+
+datatype aexpm = Nm int | Vm vname | Plusm aexpm aexpm | Timesm aexpm aexpm
+
+fun avalm :: "aexpm \<Rightarrow> state \<Rightarrow> val" where
+  "avalm (Nm a) s = a" |
+  "avalm (Vm x) s = s x" |
+  "avalm (Plusm a b) s = avalm a s + avalm b s" |
+  "avalm (Timesm a b) s = avalm a s * avalm b s"
+
+fun plusm :: "aexpm \<Rightarrow> aexpm \<Rightarrow> aexpm" where
+  "plusm (Nm a) (Nm b) = Nm (a+b)" |
+  "plusm p (Nm i) = (if i = 0 then p else Plusm p (Nm i))" |
+  "plusm (Nm i) p = (if i = 0 then p else Plusm (Nm i) p)" |
+  "plusm p q = (Plusm p q)"
+
+fun timesm :: "aexpm \<Rightarrow> aexpm \<Rightarrow> aexpm" where
+  "timesm (Nm a) (Nm b) = Nm (a*b)" |
+  "timesm p (Nm i) = 
+    (if i = 0 then (Nm 0) else if i = 1 then p else Timesm p (Nm i))" |
+  "timesm (Nm i) p = 
+    (if i = 0 then (Nm 0) else if i = 1 then p else Timesm p (Nm i))" |
+  "timesm p q = (Timesm p q)"
+
+fun asimpm :: "aexpm \<Rightarrow> aexpm" where
+  "asimpm (Nm a) = Nm a" |
+  "asimpm (Vm x) = Vm x" |
+  "asimpm (Plusm p q) = plusm (asimpm p) (asimpm q)" |
+  "asimpm (Timesm p q) = timesm (asimpm p) (asimpm q)"
+
+lemma avalm_plus[simp]: "avalm (plusm p q) s = avalm p s + avalm q s"
+  apply (induction rule:plusm.induct)
+  apply (auto)
+  done
+
+lemma avalm_times[simp]: "avalm (timesm p q) s = avalm p s * avalm q s"
+  apply (induction rule:timesm.induct)
+  apply (auto)
+  done
+
+theorem "avalm (asimpm p) s = avalm p s"
+  apply (induction p)
+  apply (auto)
+  done
 
 end
