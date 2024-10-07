@@ -442,5 +442,42 @@ theorem "exec (comp a) s stk = Some (aval a s # stk) "
   apply(auto simp add: exec_lemma)
   done
 
+(* 3.11 *)
+
+type_synonym reg = nat
+
+datatype rinstr = LDI val reg | LD vname reg | ADD reg reg
+
+fun rexec1 :: "rinstr \<Rightarrow> state \<Rightarrow> (reg \<Rightarrow> int) \<Rightarrow> reg \<Rightarrow> int" where
+  "rexec1 (LDI n r) s rs = rs(r:=n)" |
+  "rexec1 (LD v r) s rs = rs(r:=(s v))" |
+  "rexec1 (ADD r q) s rs = rs(r:=(rs r)+(rs q))"
+
+fun rexec :: "rinstr list \<Rightarrow> state \<Rightarrow> (reg \<Rightarrow> int) \<Rightarrow> reg \<Rightarrow> int" where
+  "rexec [] s rs = rs" |
+  "rexec (x # xs) s rs = rexec xs s (rexec1 x s rs)"
+
+fun rcomp :: "aexp \<Rightarrow> reg \<Rightarrow> rinstr list" where
+  "rcomp (N n) r = [LDI n r]" |
+  "rcomp (V x) r = [LD x r]" |
+  "rcomp (Plus p q) r = (rcomp p r) @ (rcomp q (r+1)) @ ([ADD r (r+1)])"
+
+
+lemma rexec_app[simp]: "rexec (xs @ ys) s rs = rexec ys s (rexec xs s rs)"
+  apply (induction xs arbitrary: rs)
+  apply (auto)
+  done
+
+lemma rcomp_respects: "r < q \<Longrightarrow> rexec (rcomp a q) s rs r = rs r"
+  apply (induction a arbitrary: rs r q)
+  apply (auto)
+  done
+
+theorem "rexec (rcomp a r) s rs r = aval a s"
+  apply (induction a arbitrary:rs r)
+  apply (auto simp add: rcomp_respects)
+  done
+
+
 
 end
