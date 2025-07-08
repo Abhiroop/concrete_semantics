@@ -1,3 +1,11 @@
+### Corecursion and codata types
+
+- [Defining (Co)datatypes in Isabelle/HOL](https://isabelle.in.tum.de/website-Isabelle2013-2/dist/Isabelle2013-2/doc/datatypes.pdf)
+- [Examples of Inductive and Coinductive Definitions in HOL](https://isabelle.in.tum.de/library/HOL/HOL-Induct/document.pdf)
+
+
+### Older stuff
+
 - [Types, Bytes, and Separation Logic](https://trustworthy.systems/publications/nicta_full_text/134.pdf)
 - [Physical Addressing on Real Hardware in Isabelle/HOL](https://people.inf.ethz.ch/troscoe/pubs/achermann_itp_2018.pdf) - [Isabelle/HOL mechanisation](https://github.com/BarrelfishOS/Isabelle-hardware-models)
 - [A Formal Foundation for Secure Remote Execution of Enclaves](https://eprint.iacr.org/2017/565.pdf) - [Boogie mechanization](https://github.com/0tcb/TAP)
